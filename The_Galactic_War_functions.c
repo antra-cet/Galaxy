@@ -262,28 +262,32 @@ scutului dupa modificare.
 
 void UPG(cdll_list_t *galaxy, unsigned int n, unsigned int sh_index, unsigned int value) {
 
-
+	//Verificare index planeta
 	if (n >= galaxy->size) {
 		printf("Planet out of bounds!\n");
 		return;
 	}
 
-	cdll_node_t *curr;
-
-	curr = galaxy->head;
+	//Ajungere pe pozitia planetei dorite
+	cdll_node_t *curr = galaxy->head;
 	for (unsigned int i = 0; i < n; i++) {
 		curr = curr->next;
 	}
 
+	//Verificare index scut
 	if (sh_index >= ((planet_t *)curr->data)->shields->size) {
 		printf("Shield out of bounds!\n");
 		return;
 	}
 
+	//upgradare valoare scut
 	cdll_node_t *curr_shield = upgrade_shield(((planet_t *)curr->data)->shields, sh_index);
 	memcpy(curr_shield->data, &value, sizeof(unsigned int));
 }
 
+/*Functia de mai jos returneaza la pozitia scutului dorita si este
+apelata in functia UPG().
+*/
 cdll_node_t *upgrade_shield(cdll_list_t *shields, unsigned int sh_index) {
 
 	cdll_node_t *curr;
@@ -295,21 +299,36 @@ cdll_node_t *upgrade_shield(cdll_list_t *shields, unsigned int sh_index) {
 
 	return curr;
 }
+
+//EXP
+
+/*Functia introduce la finalul listei de scuturi a unei planete
+un nod care retine valoarea value.
+*/
 void EXP(cdll_list_t *galaxy, unsigned int n, unsigned int value) {
 
+	//Verificare index planeta
 	if (n > galaxy->size) {
 		printf("Planet out of bounds!\n");
 		return;
 	}
 
+	//Ajungere pe pozitia planetei dorite
 	cdll_node_t *curr = galaxy->head;
 	for (unsigned int i = 0; i < n; i++) {
 		curr = curr->next;
 	}
-	add_shield(((planet_t *)curr->data)->shields, value);
 
+	//Se pune la final un nou scut cu valoarea value
+	add_shield(((planet_t *)curr->data)->shields, value);
 }
+
+/*add_shields() este apelata de functia EXP() si adauga la finalul
+listei de scuturi un nou nod.
+*/
 void add_shield(cdll_list_t *shields, unsigned int value) {
+
+	//Alocare memorie pentru noul nod + pentru data
 	cdll_node_t *new_shield = malloc(sizeof(cdll_node_t));
 	DIE(new_shield == NULL, "Memory error!\n");
 
@@ -318,22 +337,32 @@ void add_shield(cdll_list_t *shields, unsigned int value) {
 
 	memcpy(new_shield->data, &value, sizeof(unsigned int));
 
+	//Introducere primul element in cazul unei liste goale
 	if (shields->size == 0) {
 		shields->head = new_shield;
 		new_shield->next = new_shield;
 		new_shield->prev = new_shield;
 
+		//Se mareste lungimea listei
 		shields->size++;
 		return;
 	}
 
+	//Introducere element la finalul listei
+	//Se adauga legaturile necesare
 	new_shield->next = shields->head;
 	new_shield->prev = shields->head->prev;
 	shields->head->prev->next = new_shield;
 	shields->head->prev = new_shield;
 
+	//Se mareste lungimea listei
 	shields->size++;
 }
+
+//RMV
+
+/*
+*/
 void RMV(cdll_list_t *galaxy, unsigned int n, unsigned int sh_index) {
 
 	if (n > galaxy->size) {

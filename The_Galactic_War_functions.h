@@ -41,32 +41,44 @@ typedef struct {
 
 }planet_t;
 
-
+//Functii apelate din main()
 void start_command (char command[], cdll_list_t *galaxy);
 cdll_list_t *create_list(void);
 
+//Functiile necesare comenzii ADD
 void ADD(cdll_list_t *galaxy, char name[], unsigned int n, unsigned int num_shields);
 void add_nth_planet(cdll_list_t *galaxy, cdll_node_t *new_planet, unsigned int n);
 void add_first_planet(cdll_list_t *galaxy, cdll_node_t *new_planet);
 
+//Functiile necesare comenzii UPG
 void UPG(cdll_list_t *galaxy, unsigned int n, unsigned int sh_index, unsigned int value);
 cdll_node_t *upgrade_shield(cdll_list_t *shields, unsigned int sh_index);
 
+//Functiile necesare comenzii BLH
 void BLH(cdll_list_t *galaxy, unsigned int n);
 
+//Functiile necesare comenzii EXP
 void EXP(cdll_list_t *galaxy, unsigned int n, unsigned int value);
 void add_shield(cdll_list_t *shields, unsigned int value);
 
+//Functiile necesare comenzii RMV
 void RMV(cdll_list_t *galaxy, unsigned int n, unsigned int sh_index);
 void remove_shield(cdll_list_t *shields, unsigned int sh_index);
 
+//Functiile necesare comenzii COL
 void COL(cdll_list_t *galaxy, unsigned int index1, unsigned int index2);
 cdll_node_t *collision_node(cdll_list_t *shields, unsigned int sh_index);
 void remove_planet(cdll_list_t *galaxy, cdll_node_t *planet);
 
+//Functiile necesare comenzii ROT
 void ROT();
 void planet_rotation();
-void SHW();
+
+//Functiile necesare comenzii SHW
+void SHW(cdll_list_t *galaxy, unsigned int n);
+
 void print_galaxy (cdll_list_t *galaxy);
+
+//Functii de eliberare a memoriei
 void free_shields(cdll_list_t **shields);
 void free_galaxy(cdll_list_t **galaxy);
