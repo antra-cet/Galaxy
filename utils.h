@@ -1,11 +1,12 @@
+// Copyright 2021 <Copyright UPB Bucuresti>
 /**
  * Useful structures/macros
  *
  * https://ocw.cs.pub.ro/courses/so/laboratoare/resurse/die
  */
 
-#ifndef __UTILS_H_
-#define __UTILS_H_
+#ifndef UTILS_H_
+#define UTILS_H_
 
 #include <errno.h>
 #include <stdio.h>

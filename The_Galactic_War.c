@@ -1,3 +1,4 @@
+// Copyright 2021 <Copyright Bivolaru Andra>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,10 +7,9 @@
 
 #define COMMAND_LENGTH 100
 
-int main() {
-    
+int main(void) {
     /*Declar variabila care retine comanda data de la tastatura,
-    numarul de comenzi M si lista galaxiei .
+    numarul de comenzi M si lista galaxiei.
     */
     char command[COMMAND_LENGTH];
     unsigned int M;
@@ -28,7 +28,7 @@ int main() {
     /*eliberam lista galaxiei in cazul
     in care a fost folosita.*/
     if (galaxy != NULL) {
-        free_galaxy(&galaxy);
+        free_galaxy(galaxy);
     }
 
     return 0;
