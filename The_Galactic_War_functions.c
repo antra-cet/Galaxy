@@ -4,8 +4,8 @@
 #include <string.h>
 #include <math.h>
 
-#include "The_Galactic_War_functions.h"
-#include "utils.h"
+#include "./The_Galactic_War_functions.h"
+#include "./utils.h"
 
 /* Functia de mai jos este apelata in main() si are 
 rolul de a recunoaste comanda introdusa la tastatura si de
@@ -88,7 +88,7 @@ void start_command(char command[], cdll_list_t *galaxy) {
 }
 
 /*Aceasta functie creaza o lista circulara dublu inlantuita
-alocand memorie pentru aceasta si initializand camurile ei.
+alocand memorie pentru aceasta si initializand campurile ei.
 */
 cdll_list_t *create_list(void) {
 	cdll_list_t *list = malloc(sizeof(cdll_list_t));
@@ -112,18 +112,22 @@ void fill_shield_list(cdll_list_t *shields) {
 
 
 		if (i == 0) {
+			// Se introduce primul element in lista
 			shields->head = new_shield;
 			new_shield->next = new_shield;
 			new_shield->prev = new_shield;
 		} else {
+			// Se introduce ultimul element in lista
 			new_shield->next = shields->head;
 			new_shield->prev = shields->head->prev;
 			shields->head->prev->next = new_shield;
 			shields->head->prev = new_shield;
 		}
+		// Se aloca memorie pentru fiecare scut
 		new_shield->data = malloc(sizeof(unsigned int));
 		DIE(new_shield->data == NULL, "Memory error!\n");
 
+		// Se initializeaza scuturile cu valoarea 1
 		unsigned int data = 1;
 		memcpy(new_shield->data, &data, sizeof(unsigned int));
 	}
@@ -133,13 +137,12 @@ void fill_shield_list(cdll_list_t *shields) {
 
 /*Implementata mai jos este comanda ADD, care
 face verificarile de memorie necesare, apoi aloca
-memorie pentru campurile pe care le necesita o planeta.
+memorie pentru campurile pe care le are o planeta.
 De asemenea, se fac verificarile aferente pentru indecsii introdusi
-(se verifica daca exista acea pozitie in liste).
+(se verifica daca exista acea pozitie in lista).
 Pe urma, verifica daca trebuie introdus primul element din lista sau
 un element de pe orice alta pozitie, apeland pentru fiecare
 caz functia necesara.*/
-
 void ADD(cdll_list_t *galaxy, char name[], unsigned int n,
 		 unsigned int num_shields) {
 	DIE(galaxy == NULL, "Memory error!\n");
@@ -157,7 +160,8 @@ void ADD(cdll_list_t *galaxy, char name[], unsigned int n,
 	new_planet->data = malloc(sizeof(planet_t));
 	DIE(new_planet->data == NULL, "memory error!\n");
 
-	strcpy(((planet_t *)new_planet->data)->name, name);
+	snprintf(((planet_t *)new_planet->data)->name,
+			 (strlen(name) + 1) * sizeof(char), "%s", name);
 
 	((planet_t *)new_planet->data)->shields = create_list();
 	DIE(((planet_t *)new_planet->data)->shields == NULL, "Memory error!\n");
@@ -184,26 +188,30 @@ void ADD(cdll_list_t *galaxy, char name[], unsigned int n,
 
 /*Cele doua functi de mai jos creaza lista dublu inlantuita
 circulara introducand un nod nou (o planeta noua) pe pozitia dorita.*/
-
 void add_nth_planet(cdll_list_t*galaxy,
 					cdll_node_t *new_planet, unsigned int n) {
 	cdll_node_t *curr;
-	curr = galaxy->head;
 
+	// Se ajunge la pozitia dorita
+	curr = galaxy->head;
 	for (unsigned int i = 0; i < n; i++)
 		curr = curr->next;
 
+	// Se introduce planeta
 	new_planet->next = curr;
 	new_planet->prev = curr->prev;
 
 	curr->prev->next = new_planet;
 	curr->prev = new_planet;
 
+	/*In cazul in care se introduce o planeta
+	pe pozitia 0, head trebuie mutat*/
 	if (n == 0)
 		galaxy->head = new_planet;
 }
 
 void add_first_planet(cdll_list_t *galaxy, cdll_node_t *new_planet) {
+	// Se introduce primul element din lista de planete
 	galaxy->head = new_planet;
 	new_planet->next = new_planet;
 	new_planet->prev = new_planet;
@@ -213,7 +221,7 @@ void add_first_planet(cdll_list_t *galaxy, cdll_node_t *new_planet) {
 
 /*In continuare, este implementata functia de BLH, care elimina
 o planeta din galaxie. Aceasta initial ajunge cu ajutorul unui
-nod auxiliar ( curr ), pe pozitia planetei care va fi "eaten by the vortex".
+nod auxiliar ( curr ) pe pozitia planetei care va fi eliminata.
 Se fac verificarile indecsilor si in cazul in care prima planeta din lista
 va fi eliminata, mutam si galaxy->head.
 La final, se elibereaza memoria atribuita planetei.
@@ -252,7 +260,8 @@ void BLH(cdll_list_t *galaxy, unsigned int n) {
 		   ((planet_t *)curr->data)->name);
 
 	// Eliberare memorie
-	free_shields(((planet_t *)free_pointer->data)->shields);
+	cdll_list_t *shields_l = ((planet_t *)free_pointer->data)->shields;
+	free_shields(&shields_l);
 	free(free_pointer->data);
 	free(free_pointer);
 
@@ -266,7 +275,6 @@ void BLH(cdll_list_t *galaxy, unsigned int n) {
 Indexul planetei din galaxie, al scutului care trebuie modificat si valoarea
 scutului dupa modificare. 
 */
-
 void UPG(cdll_list_t *galaxy, unsigned int n,
 		 unsigned int sh_index, unsigned int value) {
 	// Verificare index planeta
@@ -295,8 +303,7 @@ void UPG(cdll_list_t *galaxy, unsigned int n,
 }
 
 /*Functia de mai jos returneaza la pozitia scutului dorita si este
-apelata in functia UPG().
-*/
+apelata in functia UPG().*/
 cdll_node_t *upgrade_shield(cdll_list_t *shields, unsigned int sh_index) {
 	cdll_node_t *curr;
 	curr = shields->head;
@@ -311,8 +318,7 @@ cdll_node_t *upgrade_shield(cdll_list_t *shields, unsigned int sh_index) {
 // EXP
 
 /*Functia introduce la finalul listei de scuturi a unei planete
-un nod care retine valoarea value.
-*/
+un nod care retine valoarea value.*/
 void EXP(cdll_list_t *galaxy, unsigned int n, unsigned int value) {
 	// Verificare index planeta
 	if (n >= galaxy->size) {
@@ -328,11 +334,11 @@ void EXP(cdll_list_t *galaxy, unsigned int n, unsigned int value) {
 
 	// Se pune la final un nou scut cu valoarea value
 	add_shield(((planet_t *)curr->data)->shields, value);
+	((planet_t *)curr->data)->shields->size++;
 }
 
 /*add_shields() este apelata de functia EXP() si adauga la finalul
-listei de scuturi un nou nod.
-*/
+listei de scuturi un nou nod.*/
 void add_shield(cdll_list_t *shields, unsigned int value) {
 	// Alocare memorie pentru noul nod + pentru data
 	cdll_node_t *new_shield = malloc(sizeof(cdll_node_t));
@@ -349,8 +355,6 @@ void add_shield(cdll_list_t *shields, unsigned int value) {
 		new_shield->next = new_shield;
 		new_shield->prev = new_shield;
 
-		// Se mareste lungimea listei
-		shields->size++;
 		return;
 	}
 
@@ -358,19 +362,15 @@ void add_shield(cdll_list_t *shields, unsigned int value) {
 	// Se adauga legaturile necesare
 	cdll_node_t *curr = shields->head->prev;
 	new_shield->next = curr->next;
-	new_shield->prev = curr->prev;
+	new_shield->prev = curr;
 	curr->next->prev = new_shield;
 	curr->next = new_shield;
-
-	// Se mareste lungimea listei
-	shields->size++;
 }
 
 // RMV
 
 /* Aceasta functie sterge scutul de pe pozitia
-sh_index, al planetei de pe pozitia n din galaxie.
-*/
+sh_index, al planetei de pe pozitia n din galaxie.*/
 void RMV(cdll_list_t *galaxy, unsigned int n, unsigned int sh_index) {
 	// Se verifica pozitia planetei daca exista
 	if (n >= galaxy->size) {
@@ -390,37 +390,43 @@ void RMV(cdll_list_t *galaxy, unsigned int n, unsigned int sh_index) {
 		return;
 	}
 
-	if (((planet_t *)curr->data)->shields->size <= 4) {
+	// Verificare numar scuturi
+	if (((planet_t *)curr->data)->shields->size == 4) {
 		printf("A planet cannot have less than 4 shields!\n");
 		return;
 	}
 
-	remove_shield(((planet_t *)curr->data)->shields, sh_index);
+	// Eliminare scut
+	cdll_node_t *free_pointer;
+	free_pointer = remove_nth_shield(((planet_t *)curr->data)->shields, sh_index);
+
+	// Se micsoreaza marimea listei de scuturi
+	((planet_t *)curr->data)->shields->size--;
+
+	// Se elibereaza memoria ocupata de scutul sters
+	free(free_pointer->data);
+	free(free_pointer);
 }
 
-/* Functia remove_shield elimina scutul de pe pozitia sh_index.
-*/
-void remove_shield(cdll_list_t *shields, unsigned int sh_index) {
+/* Functia remove_shield returneaza scutul de pe pozitia sh_index
+si modifica legaturile din lista.*/
+cdll_node_t *remove_nth_shield(cdll_list_t *shields, unsigned int sh_index) {
 	// Se ajunge la scutul de pe pozitia dorita
 	cdll_node_t *curr = shields->head;
-	if (sh_index == 0) {
-		shields->head = curr->next;
-	}
-
 	for (unsigned int i = 0; i < sh_index; i++) {
 		curr = curr->next;
+	}
+
+	// Schimbare head in cazul in care s-a eliminat primul scut
+	if (sh_index == 0) {
+		shields->head = shields->head->next;
 	}
 
 	// Se schimba legaturile din lista
 	curr->prev->next = curr->next;
 	curr->next->prev = curr->prev;
 
-	// Se elibereaza memoria ocupata de scutul sters
-	free(curr->data);
-	free(curr);
-
-	// Se micsoreaza marimea listei de scuturi
-	shields->size--;
+	return curr;
 }
 
 // COL
@@ -509,7 +515,8 @@ void remove_planet(cdll_list_t *galaxy, cdll_node_t *planet) {
 	planet->prev->next = planet->next;
 	planet->next->prev = planet->prev;
 
-	free_shields(((planet_t *)free_pointer->data)->shields);
+	cdll_list_t *shields_l = ((planet_t *)free_pointer->data)->shields;
+	free_shields(&shields_l);
 	free(free_pointer->data);
 	free(free_pointer);
 
@@ -562,10 +569,27 @@ void ROT(cdll_list_t *galaxy, unsigned int n,
 
 	// Apelare functii de rotire
 	units = units % (((planet_t *)curr->data)->shields->size);
+	if (units > (((planet_t *)curr->data)->shields->size) / 2) {
+		units = (((planet_t *)curr->data)->shields->size) - units;
+		if (direction == 'c') {
+			direction = 't';
+		} else {
+			direction = 'c';
+		}
+	}
+
 	if (direction == 'c') {
-		planet_rotation_c(((planet_t *)curr->data)->shields, units);
+		cdll_node_t *curr_sh = ((planet_t *)curr->data)->shields->head;
+		for (unsigned int i = 0; i < units; i++) {
+			curr_sh = curr_sh->prev;
+		}
+		((planet_t *)curr->data)->shields->head = curr_sh;
 	} else {
-		planet_rotation_t(((planet_t *)curr->data)->shields, units);
+		cdll_node_t *curr_sh = ((planet_t *)curr->data)->shields->head;
+		for (unsigned int i = 0; i < units; i++) {
+			curr_sh = curr_sh->next;
+		}
+		((planet_t *)curr->data)->shields->head = curr_sh;
 	}
 }
 
@@ -576,44 +600,18 @@ prin parcurgere in sens invers decat cel initial (c sau t).
 */
 void planet_rotation_t(cdll_list_t *shields, unsigned int units) {
 	cdll_node_t *curr = shields->head;
-
-	if (units > shields->size / 2) {
-		units = shields->size - units;
-		for (unsigned int i = 0; i < units; i++) {
-			curr = curr->prev;
-		}
-		shields->head = curr;
-		return;
+	for (unsigned int i = 0; i < units; i++) {
+		curr = curr->next;
 	}
-
-	if (units <= shields->size / 2) {
-		for (unsigned int i = 0; i < units; i++) {
-			curr = curr->next;
-		}
-		shields->head = curr;
-		return;
-	}
+	shields->head = curr;
 }
 
 void planet_rotation_c(cdll_list_t *shields, unsigned int units) {
 	cdll_node_t *curr = shields->head;
-
-	if (units > shields->size / 2) {
-		units = shields->size - units;
-		for (unsigned int i = 0; i < units; i++) {
-			curr = curr->next;
-		}
-		shields->head = curr;
-		return;
+	for (unsigned int i = 0; i < units; i++) {
+		curr = curr->prev;
 	}
-
-	if (units <= shields->size / 2) {
-		for (unsigned int i = 0; i < units; i++) {
-			curr = curr->prev;
-		}
-		shields->head = curr;
-		return;
-	}
+	shields->head = curr;
 }
 
 // SHW
@@ -680,11 +678,11 @@ void print_shields(cdll_list_t *shields) {
 si elibereaza memoria atat pentru lista galxiei cat si
 pentru lista de scuturi.
 */
-void free_shields(cdll_list_t *shields) {
+void free_shields(cdll_list_t **shields) {
 	cdll_node_t *curr, *free_pointer;
-	curr = shields->head;
+	curr = (*shields)->head;
 
-	for (unsigned int i = 0; i < shields->size - 1; i++) {
+	for (unsigned int i = 0; i < (*shields)->size - 1; i++) {
 		free_pointer = curr;
 		curr = curr->next;
 
@@ -695,26 +693,27 @@ void free_shields(cdll_list_t *shields) {
 	free(free_pointer->data);
 	free(free_pointer);
 
-	free(shields);
+	free(*shields);
 }
 
-void free_galaxy(cdll_list_t *galaxy) {
+void free_galaxy(cdll_list_t **galaxy) {
 	// Verificare daca a fost creata lista
-	if (galaxy == NULL) {
+	if (*galaxy == NULL) {
 		return;
 	}
 
 	cdll_node_t *curr, *free_pointer;
-	curr = galaxy->head;
+	curr = (*galaxy)->head;
 
-	for (unsigned int i = 0; i < galaxy->size; i++) {
+	for (unsigned int i = 0; i < (*galaxy)->size; i++) {
 		free_pointer = curr;
 		curr = curr->next;
 
-		free_shields(((planet_t *)free_pointer->data)->shields);
+		cdll_list_t *shields_l = ((planet_t *)free_pointer->data)->shields;
+		free_shields(&shields_l);
 		free(free_pointer->data);
 		free(free_pointer);
 	}
 
-	free(galaxy);
+	free(*galaxy);
 }

@@ -28,7 +28,7 @@ int main(void) {
     /*eliberam lista galaxiei in cazul
     in care a fost folosita.*/
     if (galaxy != NULL) {
-        free_galaxy(galaxy);
+        free_galaxy(&galaxy);
     }
 
     return 0;

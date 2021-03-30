@@ -1,5 +1,6 @@
 // Copyright 2021 <Copyright Bivolaru Andra>
-#pragma once
+#ifndef THE_GALACTIC_WAR_FUNCTIONS_H_
+#define THE_GALACTIC_WAR_FUNCTIONS_H_
 
 #define NAME_LENGTH 200
 
@@ -61,7 +62,7 @@ void add_shield(cdll_list_t *shields, unsigned int value);
 
 // Functiile necesare comenzii RMV
 void RMV(cdll_list_t *galaxy, unsigned int n, unsigned int sh_index);
-void remove_shield(cdll_list_t *shields, unsigned int sh_index);
+cdll_node_t *remove_nth_shield(cdll_list_t *shields, unsigned int sh_index);
 
 // Functiile necesare comenzii COL
 void COL(cdll_list_t *galaxy, unsigned int index1, unsigned int index2);
@@ -79,5 +80,7 @@ void SHW(cdll_list_t *galaxy, unsigned int n);
 void print_shields(cdll_list_t *shields);
 
 // Functii de eliberare a memoriei
-void free_shields(cdll_list_t *shields);
-void free_galaxy(cdll_list_t *galaxy);
+void free_shields(cdll_list_t **shields);
+void free_galaxy(cdll_list_t **galaxy);
+
+#endif  // THE_GALACTIC_WAR_FUNCTIONS_H_

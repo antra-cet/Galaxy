@@ -22,4 +22,4 @@
         }                                                                      \
     } while (0)
 
-#endif /* __UTILS_H_ */
+#endif  // UTILS_H_
